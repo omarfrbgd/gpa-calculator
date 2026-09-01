@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPA Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #10121c;
+    --bg-panel: #191d2e;
+    --bg-field: #10121c;
+    --accent: #ffb454;
+    --accent-2: #7c6cf0;
+    --text: #eef0fb;
+    --text-dim: #9aa0c3;
+    --danger: #ff6b6b;
+    --success: #4ade9a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      linear-gradient(rgba(8,9,16,0.72), rgba(8,9,16,0.82)),
+      url('tiger-bg.png');
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+    font-family: 'Cairo', sans-serif;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px 60px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(25,29,46,0.88);
+    backdrop-filter: blur(6px);
+    border-radius: 22px;
+    padding: 28px 22px 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,180,84,0.15);
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 26px;
+  }
+
+  .header .badge {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--accent);
+    background: rgba(255,180,84,0.12);
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: clamp(22px, 6vw, 28px);
+    font-weight: 900;
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 16px 0 6px;
+    font-weight: 600;
+  }
+
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--bg-field);
+    border: 1.5px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 13px 14px;
+    font-size: 16px;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  input:focus {
+    border-color: var(--accent-2);
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .btn {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 18px;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-2), #5a4bd6);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: var(--bg-field);
+    color: var(--text);
+    border: 1.5px solid rgba(255,255,255,0.08);
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    color: #1a1200;
+  }
+
+  #fields-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .subject-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: var(--bg-field);
+    border-radius: 12px;
+    padding: 8px 12px;
+  }
+
+  .subject-row span {
+    font-size: 14px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    min-width: 90px;
+  }
+
+  .subject-row input {
+    background: transparent;
+    border: none;
+    padding: 6px 4px;
+  }
+
+  #error-msg {
+    color: var(--danger);
+    font-size: 14px;
+    margin-top: 10px;
+    display: none;
+    text-align: center;
+  }
+
+  #result {
+    display: none;
+    margin-top: 22px;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, rgba(255,180,84,0.14), rgba(124,108,240,0.10));
+    border: 1px solid rgba(255,180,84,0.2);
+    text-align: center;
+  }
+
+  #result .gpa-number {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+
+  #result .rating-text {
+    font-size: 17px;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+
+  #result .student-name {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <span class="badge">Ready for university 🎓</span>
+    <h1>GPA Calculator</h1>
+  </div>
+
+  <label for="name-input">Your name</label>
+  <input type="text" id="name-input" placeholder="Enter your name">
+
+  <label for="subjects-input">How many subjects?</label>
+  <input type="number" id="subjects-input" min="1" placeholder="e.g. 5">
+
+  <button class="btn btn-secondary" onclick="generateFields()">Add grade fields</button>
+
+  <div id="fields-container"></div>
+
+  <div id="error-msg"></div>
+
+  <button class="btn btn-primary" onclick="calculateGPA()">Calculate GPA</button>
+
+  <div id="result">
+    <div class="gpa-number" id="gpa-value"></div>
+    <div class="rating-text" id="rating-value"></div>
+    <div class="student-name" id="name-value"></div>
+    <button class="btn btn-accent" onclick="downloadResult()">Download result</button>
+  </div>
+</div>
+
+<script>
+let lastResult = null;
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function clearError() {
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+function generateFields() {
+  clearError();
+  document.getElementById('result').style.display = 'none';
+
+  const num = parseInt(document.getElementById('subjects-input').value);
+  const container = document.getElementById('fields-container');
+  container.innerHTML = '';
+
+  if (!num || num <= 0) {
+    showError('Please enter a valid number of subjects');
+    return;
+  }
+
+  for (let i = 1; i <= num; i++) {
+    const row = document.createElement('div');
+    row.className = 'subject-row';
+    row.innerHTML = `<span>Subject ${i}</span><input type="number" class="grade-input" placeholder="Grade" step="0.01">`;
+    container.appendChild(row);
+  }
+}
+
+function calculateGPA() {
+  clearError();
+  const inputs = document.querySelectorAll('.grade-input');
+
+  if (inputs.length === 0) {
+    showError('Add the grade fields first');
+    return;
+  }
+
+  const grades = [];
+  for (const input of inputs) {
+    const val = parseFloat(input.value);
+    if (isNaN(val)) {
+      showError('Please enter a valid grade for every subject');
+      return;
+    }
+    grades.push(val);
+  }
+
+  const gpa = grades.reduce((a, b) => a + b, 0) / grades.length;
+
+  let rating;
+  if (gpa >= 90) {
+    rating = "ممتاز يا بطل";
+  } else if (gpa >= 80) {
+    rating = "جيد جداً يابن الفاجره";
+  } else if (gpa >= 65) {
+    rating = "جيد(انت ضعيف نيك بصراحه)";
+  } else {
+    rating = "اشتغل عدل يبنالمتناكه";
+  }
+
+  const name = document.getElementById('name-input').value || "Champ";
+
+  document.getElementById('gpa-value').textContent = gpa.toFixed(2);
+  document.getElementById('rating-value').textContent = rating;
+  document.getElementById('name-value').textContent = name;
+  document.getElementById('result').style.display = 'block';
+
+  lastResult = { name, gpa: gpa.toFixed(2), rating };
+}
+
+function downloadResult() {
+  if (!lastResult) return;
+  const content = `Student: ${lastResult.name}\nGPA: ${lastResult.gpa}\nRating: ${lastResult.rating}\n`;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'result.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
